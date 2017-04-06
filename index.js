@@ -15,21 +15,24 @@ const Intersection = xs =>
     Intersection(xs.filter(x => ys.some(y => x === y)))
 })
 
-
-
 const related = name => 
   Api.findArtist(name)
+  .map(artist => {
+    console.log (artist.name)
+    return artist
+  })
   .map(artist => artist.id)
   .chain(Api.relatedArtists)
   .map(artists => artists.map(artist => artist.name))
 
 const artistIntersection = rels => 
-  rels.foldMap(Intersection)
-  .toList()
+  rels.foldMap(Intersection).xs
+
 
 const main = (names) =>
   List(names)
   .traverse(Task.of, related)
+  .map(artistIntersection)
 
   
 names.chain(main).fork(console.error, console.log)
